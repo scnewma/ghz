@@ -25,7 +25,7 @@ enum Commands {
 }
 
 fn main() -> anyhow::Result<()> {
-    let cfg = Config::default();
+    let cfg = Config::load()?;
     let args = Cli::parse();
 
     match args.command {

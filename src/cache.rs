@@ -26,7 +26,7 @@ impl Cache {
     }
 
     pub fn load(cfg: &Config) -> anyhow::Result<Cache> {
-        Cache::load_from(&cfg.cache_dir())
+        Cache::load_from(&cfg.cache_dir)
     }
 
     pub fn save(self) -> anyhow::Result<()> {
