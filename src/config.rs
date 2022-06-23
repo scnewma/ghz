@@ -4,6 +4,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use anyhow::Context;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 fn homedir() -> PathBuf {
@@ -13,7 +14,7 @@ fn homedir() -> PathBuf {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TrackedOwner {
     pub name: String,
-    pub limit: u32,
+    pub limit: Option<u32>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -33,7 +34,7 @@ impl Config {
             return Ok(Config::default());
         }
 
-        let mut cfg: Config = read_json(path)?;
+        let mut cfg: Config = read_json(path).context("error loading configuration from file")?;
         cfg.config_dir = default_config_dir();
         cfg.cache_dir = default_cache_dir();
         Ok(cfg)
@@ -59,15 +60,16 @@ where
     P: AsRef<Path>,
     T: DeserializeOwned,
 {
-    let file = File::open(path.as_ref())?;
+    let file = File::open(path.as_ref()).context("opening config file")?;
     let reader = BufReader::new(file);
-    let v = serde_json::from_reader(reader)?;
+    let v = serde_json::from_reader(reader).context("error parsing config json")?;
     Ok(v)
 }
 
 fn default_config_dir() -> PathBuf {
     let mut buf = homedir();
-    buf.push(".ghz");
+    buf.push(".config");
+    buf.push("ghz");
     buf
 }
 

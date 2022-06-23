@@ -64,9 +64,9 @@ where
     DirBuilder::new()
         .recursive(true)
         .create(path.parent().unwrap())?;
-    let file = File::create(path)?;
+    let file = File::create(path).context("error creating file")?;
     let writer = BufWriter::new(file);
-    serde_json::to_writer(writer, s)?;
+    serde_json::to_writer(writer, s).context("error writing configuration json")?;
     Ok(())
 }
 
