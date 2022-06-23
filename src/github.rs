@@ -10,13 +10,13 @@ pub struct Repo {
     pub ssh_url: String,
 }
 
-pub fn repo_list(owner: &str) -> anyhow::Result<Vec<Repo>> {
+pub fn repo_list(owner: &str, limit: u32) -> anyhow::Result<Vec<Repo>> {
     let out = exec(&vec![
         "repo",
         "list",
         owner,
         "--limit",
-        "1000",
+        &limit.to_string(),
         "--json",
         "nameWithOwner,name,url,sshUrl",
     ])?;
