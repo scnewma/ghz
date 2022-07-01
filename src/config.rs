@@ -1,4 +1,5 @@
 use std::{
+    collections::HashMap,
     fs::File,
     io::BufReader,
     path::{Path, PathBuf},
@@ -7,14 +8,27 @@ use std::{
 use anyhow::Context;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
+use crate::github;
+
 fn homedir() -> PathBuf {
     dirs::home_dir().expect("could not get home directory path")
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
+pub enum AlfredField {
+    Title,
+    Subtitle,
+    Match,
+    Arg,
+    Autocomplete,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TrackedOwner {
     pub name: String,
     pub limit: Option<u32>,
+    pub filter_on: Option<github::RepoField>,
+    pub mappings: Option<HashMap<AlfredField, github::RepoField>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

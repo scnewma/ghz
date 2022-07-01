@@ -2,6 +2,14 @@ use anyhow::{bail, Context};
 use serde::{Deserialize, Serialize};
 use std::process::{self, Command};
 
+#[derive(Debug, Serialize, Deserialize)]
+pub enum RepoField {
+    Name,
+    NameWithOwner,
+    Url,
+    SshUrl,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Repo {
@@ -11,8 +19,26 @@ pub struct Repo {
     pub ssh_url: String,
 }
 
+impl Repo {
+    pub fn owner(&self) -> Option<&str> {
+        match self.name_with_owner.split_once('/') {
+            Some((owner, _)) => Some(owner),
+            None => None,
+        }
+    }
+
+    pub fn get(&self, field: &RepoField) -> &str {
+        match field {
+            RepoField::Name => &self.name,
+            RepoField::NameWithOwner => &self.name_with_owner,
+            RepoField::Url => &self.url,
+            RepoField::SshUrl => &self.ssh_url,
+        }
+    }
+}
+
 pub fn repo_list(owner: &str, limit: Option<u32>) -> anyhow::Result<Vec<Repo>> {
-    let out = exec(&vec![
+    let out = exec(&[
         "repo",
         "list",
         owner,
@@ -31,8 +57,8 @@ pub fn repo_list(owner: &str, limit: Option<u32>) -> anyhow::Result<Vec<Repo>> {
 }
 
 fn exec(args: &[&str]) -> anyhow::Result<process::Output> {
-    Ok(Command::new("gh")
+    Command::new("gh")
         .args(args)
         .output()
-        .context("error executing gh command")?)
+        .context("error executing gh command")
 }

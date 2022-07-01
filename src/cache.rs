@@ -40,10 +40,10 @@ impl Cache {
         Ok(())
     }
 
-    fn load_from(dir: &PathBuf) -> anyhow::Result<Cache> {
+    fn load_from(dir: &Path) -> anyhow::Result<Cache> {
         let repos_cache = dir.join("repositories.json");
         if !repos_cache.exists() {
-            return Ok(Cache::empty(dir.clone()));
+            return Ok(Cache::empty(dir.to_path_buf()));
         }
 
         read_json(&repos_cache).with_context(|| {

@@ -10,11 +10,18 @@ Github repository fuzzy filter that caches repository lists locally for fast sea
 Create a configuration file at `$HOME/.config/ghz/config.json` to state the owners of the repositories that you want to store in the cache.
 
 ```
-
 {
     "owners": [
         {"name": "scnewma"},
-        {"name": "kubernetes", "limit": 50}
+        {
+            "name": "hashicorp",
+            "limit": 5000,
+            "filter_on": "Name",
+            "mappings": {
+                "Title": "Name",
+                "Match": "Name"
+            }
+        }
     ]
 }
 ```
